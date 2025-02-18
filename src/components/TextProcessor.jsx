@@ -1,21 +1,10 @@
 import { useState } from "react";
+import { useSummary } from "use-react-summary";
 
 const TextProcessor = () => {
   const [text, setText] = useState("");
-  const [summary, setSummary] = useState("");
+  const { summarizeText, isLoading, error } = useSummary({ text, words: 100 });
   const [questions, setQuestions] = useState([]);
-
-  // Summarization function (simple sentence extraction)
-  const summarizeText = () => {
-    if (!text.trim()) {
-      alert("Please enter some text.");
-      return;
-    }
-
-    const sentences = text.split(". ");
-    const summarized = sentences.slice(0, Math.ceil(sentences.length / 3)).join(". ") + ".";
-    setSummary(summarized);
-  };
 
   // Question generation function
   const generateQuestions = () => {
@@ -34,7 +23,9 @@ const TextProcessor = () => {
 
   return (
     <div className="max-w-xl mx-auto mt-10 p-6 bg-white rounded-lg shadow-lg">
-      <h1 className="text-3xl font-bold text-center text-gray-700 mb-4">Text Summarizer & Question Generator</h1>
+      <h1 className="text-3xl font-bold text-center text-gray-700 mb-4">
+        Text Summarizer & Question Generator
+      </h1>
       <textarea
         className="w-full p-3 border border-gray-300 rounded-lg focus:ring focus:ring-green-300"
         rows="6"
@@ -43,10 +34,11 @@ const TextProcessor = () => {
         onChange={(e) => setText(e.target.value)}
       ></textarea>
       <button
-        onClick={summarizeText}
+        onClick={() => summarizeText()}
         className="mt-4 w-full bg-green-500 text-white py-2 rounded-lg hover:bg-green-600 transition"
+        disabled={isLoading}
       >
-        Summarize
+        {isLoading ? "Summarizing..." : "Summarize"}
       </button>
       <button
         onClick={generateQuestions}
@@ -55,9 +47,11 @@ const TextProcessor = () => {
         Generate Questions
       </button>
 
+      {error && <p className="text-red-500 mt-2">{error}</p>}
+
       <div className="mt-6">
         <h3 className="text-xl font-semibold text-gray-700">Summary:</h3>
-        <p className="p-3 bg-gray-100 rounded-lg">{summary}</p>
+        <p className="p-3 bg-gray-100 rounded-lg">{summarizeText}</p>
       </div>
 
       <div className="mt-6">
